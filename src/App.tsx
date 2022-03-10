@@ -1,27 +1,39 @@
-import React, { ChangeEvent, KeyboardEvent, useEffect } from "react";
+import React, { useState, ChangeEvent, KeyboardEvent, useEffect } from "react";
 import "./App.css";
-import Button from "./Button";
-import Title from "./Title";
-import Counter from "./Counter";
-import Adder from "./Adder";
-import WelcomeName from "./WelcomeName";
-import ConditionalText from "./ConditionalText";
-import HiddenName from "./HiddenName";
-import Todo from "./TodoList";
+import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Paper from "@mui/material/Paper";
+import GroupIcon from "@mui/icons-material/Group";
+import ChatIcon from "@mui/icons-material/Chat";
+
 const App = (): JSX.Element => {
-  useEffect(() => {
-    alert("hello");
-  });
+  const [tab, setTab] = useState<string>("friends");
+  const changeTab = (changedValue: string) => {
+    setTab(changedValue);
+  };
   return (
-    <>
-      <Counter defaultCounter={5} />
-      <Adder />
-      <WelcomeName />
-      <br />
-      <ConditionalText />
-      <HiddenName />
-      <Todo />
-    </>
+    <section>
+      <Paper
+        sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+        elevation={3}
+      >
+        <Tabs centered variant="fullWidth" value={tab}>
+          <Tab
+            value="friends" 
+            icon={<GroupIcon />}
+            label="친구"
+            onClick={() => changeTab("friends")}
+          />
+          <Tab
+            value="chats"
+            icon={<ChatIcon />}
+            label="채팅"
+            onClick={() => changeTab("chats")}
+          />
+        </Tabs>
+      </Paper>
+    </section>
   );
 };
 
