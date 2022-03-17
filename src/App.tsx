@@ -1,24 +1,25 @@
-import React, { useState, ChangeEvent, KeyboardEvent, useEffect } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import Box from "@mui/material/Box";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Paper from "@mui/material/Paper";
+import {Paper, Tab, Tabs} from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 import ChatIcon from "@mui/icons-material/Chat";
+import Friends from "./pages/Friends";
 
 const App = (): JSX.Element => {
-  const [tab, setTab] = useState<string>("friends");
+  const [currentTab, setCurrentTab] = useState<string>("friends");
+
   const changeTab = (changedValue: string) => {
-    setTab(changedValue);
+    setCurrentTab(changedValue);
   };
   return (
     <section>
+      <Box sx={{ pb: 7}}>{currentTab === "friends" && <Friends />}</Box>
       <Paper
         sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
         elevation={3}
       >
-        <Tabs centered variant="fullWidth" value={tab}>
+        <Tabs centered variant="fullWidth" value={currentTab}>
           <Tab
             value="friends" 
             icon={<GroupIcon />}
