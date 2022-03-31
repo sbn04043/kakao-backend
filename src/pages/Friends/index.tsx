@@ -11,32 +11,51 @@ import {
 } from "@mui/material";
 
 import Box from "@mui/material/Box";
-import { friends } from "./data";
 import ImageIcon from "@mui/icons-material/Image";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import FriendAdd from "./components/FriendAdd";
+import axios from "axios";
+
+type FriendType = {
+  id: number;
+  name: string;
+  statusMessage: string;
+};
 
 const Friends = (): JSX.Element => {
-  const [findFriend, setFindFriend] = useState(friends);
+  const [originalFriends, setOriginalFriends] = useState<FriendType[]>([]);
+  const [friendList, setFriendList] = useState<FriendType[]>([]);
 
   const [open, setOpen] = React.useState(false);
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
 
-  const searchFriend = (event: ChangeEvent<HTMLInputElement>) => {
+  const changeSearchText = (event: ChangeEvent<HTMLInputElement>) => {
     const inputText = event.currentTarget.value;
-    if (inputText === "") {
-      setFindFriend(friends);
+    if (inputText.length === 0) {
+      setFriendList(originalFriends);
     } else {
-      const searching = friends.filter((friend) => {
-        return friend.name.includes(event.currentTarget.value);
+      const filteredFriends = originalFriends.filter((friend) => {
+        return friend.name.includes(inputText);
       });
-      setFindFriend(searching);
+      setFriendList(filteredFriends);
     }
   };
+
+  const getFriendList = async () => {
+    const { data } = await axios.get<FriendType[]>(
+      "http://localhost:5000/friend/1"
+    );
+    setOriginalFriends(data);
+    setFriendList(data);
+  };
+
+  useEffect(() => {
+    getFriendList();
+  }, []);
 
   return (
     <Container>
@@ -54,7 +73,7 @@ const Friends = (): JSX.Element => {
               label="친구 검색"
               variant="outlined"
               margin="dense"
-              onChange={searchFriend}
+              onChange={changeSearchText}
             />
           </Grid>
           <Grid item xs={1.5}>
@@ -67,7 +86,7 @@ const Friends = (): JSX.Element => {
         </Grid>
       </Box>
       <List>
-        {findFriend.map((friend) => {
+        {friendList.map((friend) => {
           return (
             <ListItemButton key={friend.id}>
               <ListItemAvatar>
