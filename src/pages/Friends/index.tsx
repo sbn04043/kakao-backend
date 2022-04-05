@@ -6,6 +6,8 @@ import {
   ListItemAvatar,
   ListItemButton,
   ListItemText,
+  Menu,
+  MenuItem,
   Modal,
   TextField,
 } from "@mui/material";
@@ -33,6 +35,15 @@ const Friends = (): JSX.Element => {
   const openModal = () => setOpen(true);
   const closeModal = () => setOpen(false);
 
+  const [anchor, setAnchor] = React.useState<null | HTMLElement>(null);
+  const openMenu = Boolean(anchor);
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setAnchor(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchor(null);
+  };
+
   const changeSearchText = (event: ChangeEvent<HTMLInputElement>) => {
     const inputText = event.currentTarget.value;
     if (inputText.length === 0) {
@@ -57,13 +68,31 @@ const Friends = (): JSX.Element => {
     getFriendList();
   }, []);
 
+  const finishAddFriend = async () => {
+    await getFriendList();
+    closeModal();
+  };
+
   return (
     <Container>
       <Modal open={open} onClose={closeModal}>
         <Box>
-          <FriendAdd />
+          <FriendAdd callback={finishAddFriend} />
         </Box>
       </Modal>
+      <Menu
+        id="basic-menu"
+        anchorEl={anchor}
+        open={openMenu}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+      >
+        <MenuItem onClick={handleClose}>채팅하기</MenuItem>
+        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <MenuItem onClick={handleClose}>Logout</MenuItem>
+      </Menu>
       <Box>
         <Grid container>
           <Grid item xs={10.5}>
@@ -88,7 +117,7 @@ const Friends = (): JSX.Element => {
       <List>
         {friendList.map((friend) => {
           return (
-            <ListItemButton key={friend.id}>
+            <ListItemButton key={friend.id} onClick={handleClick}>
               <ListItemAvatar>
                 <Avatar>
                   <ImageIcon />

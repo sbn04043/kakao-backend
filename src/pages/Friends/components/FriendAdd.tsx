@@ -15,6 +15,7 @@ import { ChangeEvent, ChangeEventHandler, useState } from "react";
 import axios from "axios";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ImageIcon from "@mui/icons-material/Image";
+import { AssignmentLateRounded } from "@mui/icons-material";
 
 type SearchResultType = {
   id: number;
@@ -22,12 +23,18 @@ type SearchResultType = {
   statusMessage: string;
 };
 
-const FriendAdd = (): JSX.Element => {
-  const [searchNumber, setSearchNumber] = useState<string>();
+type FriendAddType = {
+  callback: () => void;
+};
+
+const FriendAdd = (props: FriendAddType): JSX.Element => {
+  const { callback } = props;
+  const [phone, setPhone] = useState<string>();
   const [searchFriend, setSearchFriend] = useState<SearchResultType>();
+  const [friend, setFriend] = useState<SearchResultType>();
 
   const updateSearchNumber = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchNumber(event.currentTarget.value);
+    setPhone(event.currentTarget.value);
   };
 
   const search = async () => {
@@ -35,11 +42,28 @@ const FriendAdd = (): JSX.Element => {
       "http://localhost:5000/friend/search",
       {
         params: {
-          phone: searchNumber,
+          phone,
         },
       }
     );
     setSearchFriend(data);
+  };
+
+  const addUser = async () => {
+    try {
+      await axios.post("http://localhost:5000/friend", {
+        userId: 1,
+        phone,
+      });
+      await callback();
+    } catch (e) {
+      if (axios.isAxiosError(e) && e.response) {
+        const { data } = e.response;
+        if (data) {
+          AssignmentLateRounded(data.message);
+        }
+      }
+    }
   };
 
   return (
@@ -50,7 +74,7 @@ const FriendAdd = (): JSX.Element => {
             <TextField
               fullWidth
               label="전화번호"
-              value={searchNumber}
+              value={phone}
               onChange={updateSearchNumber}
             />
           </Grid>
@@ -64,7 +88,7 @@ const FriendAdd = (): JSX.Element => {
           <List>
             <ListItem
               secondaryAction={
-                <IconButton>
+                <IconButton onClick={addUser}>
                   <PersonAddIcon />
                 </IconButton>
               }
